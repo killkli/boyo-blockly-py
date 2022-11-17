@@ -70,8 +70,10 @@ export function createTeacherLink(callTimes = 0) {
     // document.body.focus();
     // window.navigator.clipboard.writeText(teacherLink);
     createDialog(`
-    老師連結為：
+    分享連結為：
     ${teacherLink}
+    連結ID：
+    ${selfPeer.id}
     請複製連結並傳送給學生！
     `);
     settings.isTeacher = true;

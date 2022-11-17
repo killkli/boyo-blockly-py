@@ -55,7 +55,10 @@ connectToTeacher.addEventListener("click", () => {
     const urlParams = new URLSearchParams(window.location.search);
     let peerId = urlParams.get('peer');
     if (peerId === null) {
-        peerId = window.prompt("請輸入老師的分享ID");
+        peerId = window.prompt("請輸入老師分享的連線ID");
+    }
+    if (!peerId.match("[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}")){
+        PeerConnection.createDialog("ID格式錯誤，請輸入正確的連線ID");
     }
     let studentName = window.prompt("請輸入你的名稱：");
     if (studentName === null || studentName.trim().length === 0) {
