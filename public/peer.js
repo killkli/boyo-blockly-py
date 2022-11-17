@@ -59,6 +59,7 @@ connectToTeacher.addEventListener("click", () => {
     }
     if (!peerId.match("[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}")){
         PeerConnection.createDialog("ID格式錯誤，請輸入正確的連線ID");
+        return;
     }
     let studentName = window.prompt("請輸入你的名稱：");
     if (studentName === null || studentName.trim().length === 0) {
