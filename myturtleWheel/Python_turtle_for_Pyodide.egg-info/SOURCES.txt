@@ -1,0 +1,9 @@
+setup.py
+Python_turtle_for_Pyodide.egg-info/PKG-INFO
+Python_turtle_for_Pyodide.egg-info/SOURCES.txt
+Python_turtle_for_Pyodide.egg-info/dependency_links.txt
+Python_turtle_for_Pyodide.egg-info/top_level.txt
+myturtle/__init__.py
+myturtle/drawcircle.py
+myturtle/myturtle.py
+myturtle/svg.py
