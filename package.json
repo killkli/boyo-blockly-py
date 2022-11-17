@@ -21,6 +21,7 @@
     "brotli-unicode": "^1.0.2",
     "comlink": "^4.3.1",
     "comsync": "^0.0.8",
+    "diff": "^5.1.0",
     "indexeddb-fs": "^1.2.5",
     "p-retry": "^5.1.1",
     "pyodide": "^0.21.3",

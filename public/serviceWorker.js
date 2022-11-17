@@ -9,6 +9,10 @@ const assets = [
     "./js/floatingui_core.js",
     "./js/floatingui_dom.js",
     "./js/popupcontainer.js",
+    "./js/diff.min.js",
+    "./js/peer.min.js",
+    "./js/peer.js",
+    "./peer.js",
     "./main.js",
 
     "./turtle/svg.py",
