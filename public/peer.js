@@ -46,7 +46,7 @@ creatTeacherLink.addEventListener("click", () => {
     statusContainer.style.zIndex = 1000;
     statusContainer.style.position = "fixed";
     statusContainer.style.top = "0";
-    statusContainer.style.right = "0";
+    statusContainer.style.right = "35%";
     document.body.appendChild(statusContainer);
     connectToTeacher.setAttribute("disabled", true);
 });
@@ -90,7 +90,7 @@ connectToTeacher.addEventListener("click", () => {
     statusContainer.style.zIndex = 1000;
     statusContainer.style.position = "fixed";
     statusContainer.style.top = "0";
-    statusContainer.style.right = "0";
+    statusContainer.style.right = "35%";
     statusContainer.style.display = "none";
     document.body.appendChild(statusContainer);
 

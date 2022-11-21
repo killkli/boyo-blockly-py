@@ -31,15 +31,19 @@ async function loadPyodideAndPackages() {
     const micropip = pyodide.pyimport("micropip");
     await micropip.install('/turtle/custom_turtle_for_Pyodide-1.0-py3-none-any.whl');
 }
-
+self.sharedCanvas = {
+    canvas:null
+};
 let pyodideReadyPromise = loadPyodideAndPackages();
 
 self.onmessage = async (event) => {
     const { type, data, id } = event.data;
     // make sure loading is done
     await pyodideReadyPromise;
-
     switch (type) {
+        case "setCanvas":
+            sharedCanvas.canvas = data;
+            break;
         case "loadPath":
             await loadFromFile(data);
             self.postMessage({ type, data: "done", id });

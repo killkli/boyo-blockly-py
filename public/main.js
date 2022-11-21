@@ -1,4 +1,4 @@
-import { asyncRun, loadPackages, resetWorker } from "./js/py-worker.js";
+import { asyncRun, loadPackages, resetWorker,setCanvas } from "./js/py-worker.js";
 import { setupPopup } from "./js/popupcontainer.js";
 'use strict';
 /*
@@ -29,8 +29,13 @@ const stopButton = document.querySelector("#stopButton");
 const stopButtonAlways = document.querySelector("#stopButtonAlways");
 const goVMEditorButton = document.querySelector("#goVMEditorButton");
 stopButton.style.display = "none";
+
 async function codeExcute(script) {
     stopButton.style.display = "block";
+    const canvas = document.createElement("canvas");
+    canvas.width = 500;
+    canvas.height = 500;
+    setCanvas(canvas.transferControlToOffscreen());
     try {
         const { results, error, stdout } = await asyncRun(script, {}, 30);
         let message = stdout !== undefined ? stdout : "";
@@ -40,6 +45,7 @@ async function codeExcute(script) {
             message += error;
         }
         resultDiv.innerHTML = message;
+        resultDiv.appendChild(canvas);
         stopButton.style.display = "none";
     } catch (e) {
         const message = `Error in pyodideWorker at ${e.filename}, Line: ${e.lineno}, ${e.message}`;

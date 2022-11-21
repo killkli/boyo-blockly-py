@@ -118,5 +118,11 @@ const resetWorker = () => {
     executionTimeout();
 };
 
+const setCanvas = (canvas) => {
+    pyodideWorker.postMessage({
+        type: "setCanvas",
+        data: canvas,
+    }, [canvas]);
+}
 
-export { asyncRun, loadPaths, loadPackages, resetWorker };
+export { asyncRun, loadPaths, loadPackages, resetWorker, setCanvas };
