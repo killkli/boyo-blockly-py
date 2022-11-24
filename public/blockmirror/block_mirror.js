@@ -2817,16 +2817,15 @@ TOOLBOX_CATEGORY.CALCULATIONS = {
   blocks: ["___ + ___", "round(___)", "pow(___,___)", "sqrt(___)"],
 };
 TOOLBOX_CATEGORY.OUTPUT_WITH_PLOTTING = {
-  name: "輸出/輸入",
+  name: "圖表",
   colour: "PLOTTING",
   blocks: [
-    "print('Hello~')",
     "plt.plot(___)",
     "plt.scatter(___, ___)",
     "plt.hist(___)",
     "plt.bar(___, ___, tick_label=___)",
     "plt.boxplot(___)",
-    "plt.show()",
+    "format_mime(plt)",
     "plt.title(___)",
     "plt.xlabel(___)",
     "plt.ylabel(___)",
@@ -2840,8 +2839,6 @@ TOOLBOX_CATEGORY.TURTLES = {
   blocks: [
     "turtle.done()",
     "turtle.set_defaults(canvwidth=500,canvheight=500)",
-    ,
-    ,
     "turtle.forward(50)",
     "turtle.backward(50)",
     "turtle.right(90)",

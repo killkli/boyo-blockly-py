@@ -1,4 +1,4 @@
-const cacheName = "boyo-blockly-py-0.0.1"
+const cacheName = "boyo-blockly-py-0.0.3"
 const assets = [
     "/pwa-scaffold.js",
     "/js/py-worker.js",

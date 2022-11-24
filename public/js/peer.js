@@ -1,3 +1,4 @@
+import { saveNewFile } from "../main.js"
 /**
  * @type {import('peerjs').Peer}
  */
@@ -22,6 +23,7 @@ const settings = {
         const receiverDom = document.querySelector(settings.recevierDom);
         receiverDom.value = code;
     },
+    studentListDom: "#studentList",
     studentName: "student",
     isTeacher: false,
     reconnecting: true,
@@ -42,13 +44,98 @@ selfPeer.on("close", () => {
     }
 });
 
+
+// injecting badge span style
+const badgeStyle = document.createElement("style");
+badgeStyle.innerHTML = `
+    .badge {
+        position: relative;
+        top: -1px;
+        right: -1px;
+        padding: 0.1em 0.4em;
+        border-radius: 0.25em;
+        background-color: #e3342f;
+        color: white;
+        font-size: 75%;
+        font-weight: bold;
+        line-height: 1;
+        text-align: center;
+        white-space: nowrap;
+        vertical-align: baseline;
+        display: inline-block;
+        cursor: pointer;
+    }
+    .badge-primary{
+        background-color: #3490dc;
+    }
+    .badge-pill{
+        padding-right: 0.6em;
+        padding-left: 0.6em;
+        border-radius: 10rem;
+    }
+    .list-group-item{
+        position: relative;
+        display: block;
+        padding: 0.75rem 1.25rem;
+        margin-bottom: -1px;
+        background-color: #fff;
+        border: 1px solid rgba(0,0,0,.125);
+    }
+    .list-group-item:hover{
+        z-index: 2;
+        color: #495057;
+        text-decoration: none;
+        background-color: #f8f9fa;
+    }
+
+`;
+document.head.appendChild(badgeStyle);
+
 selfPeer.on("connection", (conn) => {
     studentConns.push(conn);
+    // creating connection dom element
+    const studentList = document.querySelector(settings.studentListDom);
+    const studentItem = document.createElement("li");
+    studentItem.classList.add("list-group-item");
+    studentItem.innerText = conn.metadata.name;
+    studentItem.id = conn.metadata.name;
+    const studentBadge = document.createElement("span");
+    studentBadge.classList.add("badge");
+    studentBadge.classList.add("badge-primary");
+    studentBadge.classList.add("badge-pill");
+    studentBadge.innerText = "連線中";
+    studentItem.appendChild(studentBadge);
+    studentList.appendChild(studentItem);
+    // send code to the specific student
+    studentBadge.addEventListener("click", () => {
+        if (window.confirm("確定要傳送程式碼給" + conn.metadata.name + "嗎？")) {
+            conn.send({
+                type: "teacherInfo",
+                code: settings.data()
+            });
+        }
+    });
     conn.on("data", (data) => {
         console.log('Teacher server received:', data);
+        if (data.type && data.type === "code") {
+            const receivedCodeBadge = document.createElement("span");
+            receivedCodeBadge.classList.add("badge");
+            receivedCodeBadge.classList.add("badge-primary");
+            receivedCodeBadge.classList.add("badge-pill");
+            receivedCodeBadge.innerText = "收到程式碼@" + new Date().toLocaleTimeString();
+            studentItem.appendChild(receivedCodeBadge);
+            receivedCodeBadge.addEventListener("click", () => {
+                if (window.confirm(`是否要接收${conn.metadata.name}的程式碼？`)) {
+                    saveNewFile(`ST_${conn.connectionId}.py`)
+                    window["BMeditor"].setCode(data.code);
+                    receivedCodeBadge.remove();
+                }
+            });
+        }
     });
     conn.on("close", () => {
         console.log("connection closed");
+        studentItem.remove();
         studentConns.splice(studentConns.indexOf(conn), 1);
     });
 });

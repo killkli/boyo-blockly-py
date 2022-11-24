@@ -25,10 +25,17 @@ creatTeacherLink.addEventListener("click", () => {
     const broadCastCallback = () => {
         PeerConnection.broadCastTeacherInfo();
     }
-    window["BMeditor"].addChangeListener(broadCastCallback);
     const stopBroadCastButton = document.createElement("button");
+    const brocastButton = document.createElement("button");
     const statusContainer = document.createElement("div");
     statusContainer.appendChild(stopBroadCastButton);
+    statusContainer.appendChild(brocastButton);
+    brocastButton.innerText = "廣播老師程式碼";
+    brocastButton.addEventListener("click", () => {
+        if (window.confirm("確定要廣播程式碼？")) {
+            broadCastCallback();
+        }
+    });
     stopBroadCastButton.textContent = "教師廣播中（點此停止廣播)";
     stopBroadCastButton.addEventListener("click", () => {
         window["BMeditor"].removeChangeListener(broadCastCallback);
@@ -42,11 +49,28 @@ creatTeacherLink.addEventListener("click", () => {
     ["button", "button-large", "button-warning"].forEach((className) => {
         stopBroadCastButton.classList.add(className);
     });
+    ["button", "button-large", "button-primary"].forEach((className) => {
+        brocastButton.classList.add(className);
+    });
     statusContainer.style.display = "block";
     statusContainer.style.zIndex = 1000;
     statusContainer.style.position = "fixed";
     statusContainer.style.top = "0";
     statusContainer.style.right = "35%";
+    const studentList = document.createElement("ul");
+    studentList.id = "studentList";
+    studentList.style.listStyle = "none";
+    studentList.style.display = "none";
+    brocastButton.style.display = "none";
+    statusContainer.appendChild(studentList);
+    statusContainer.addEventListener("mouseover", () => {
+        studentList.style.display = "block";
+        brocastButton.style.display = "block";
+    });
+    statusContainer.addEventListener("mouseout", () => {
+        studentList.style.display = "none";
+        brocastButton.style.display = "none";
+    });
     document.body.appendChild(statusContainer);
     connectToTeacher.setAttribute("disabled", true);
 });
@@ -57,7 +81,7 @@ connectToTeacher.addEventListener("click", () => {
     if (peerId === null) {
         peerId = window.prompt("請輸入老師分享的連線ID");
     }
-    if (!peerId.match("[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}")){
+    if (!peerId.match("[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}")) {
         PeerConnection.createDialog("ID格式錯誤，請輸入正確的連線ID");
         return;
     }
@@ -66,26 +90,54 @@ connectToTeacher.addEventListener("click", () => {
         studentName = "匿名學生" + new Date().getTime();
     }
     const connectingDialog = PeerConnection.createDialog(`連線建立中，請稍候...`, true);
-    saveNewFile("FromTeacher.py");
     PeerConnection.settingBroadcastSystem({
         studentName: studentName,
         receiver: (code) => {
+            saveNewFile("FromTeacher.py",false);
             window["BMeditor"].setCode(code);
+            window.alert("收到老師廣播的程式！")
         },
         reconnecting: true
     });
     PeerConnection.connectToTeacher(peerId);
 
     const disconnectButton = document.createElement("button");
+    const sendCodeButton = document.createElement("button");
     const statusContainer = document.createElement("div");
     statusContainer.appendChild(disconnectButton);
+    statusContainer.appendChild(sendCodeButton);
     disconnectButton.textContent = "與老師連線中（點此斷開連線)";
     disconnectButton.addEventListener("click", () => {
         disconnect();
-        disconnectButton.remove();
+        statusContainer.remove();
     });
     ["button", "button-large", "button-warning"].forEach((className) => {
         disconnectButton.classList.add(className);
+    });
+    sendCodeButton.textContent = "傳送程式碼給老師";
+    ["button", "button-large", "button-primary"].forEach((className) => {
+        sendCodeButton.classList.add(className);
+    });
+    sendCodeButton.style.display = "none";
+    sendCodeButton.addEventListener("click", () => {
+        const messageCode = window["BMeditor"].getCode();
+        const message = {
+            type: "code",
+            code: messageCode,
+        };
+        try {
+            PeerConnection.connectionToTeacher?.conn.send(message);
+            window.alert("程式碼已傳送給老師囉！");
+        } catch (e) {
+            window.alert("傳送失敗，請重新嘗試");
+            console.error(e);
+        }
+    });
+    statusContainer.addEventListener("mouseover", () => {
+        sendCodeButton.style.display = "block";
+    });
+    statusContainer.addEventListener("mouseout", () => {
+        sendCodeButton.style.display = "none";
     });
     statusContainer.style.zIndex = 1000;
     statusContainer.style.position = "fixed";

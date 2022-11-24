@@ -1,4 +1,4 @@
-import { asyncRun, loadPackages, resetWorker,setCanvas } from "./js/py-worker.js";
+import { asyncRun, loadPackages, resetWorker, setCanvas } from "./js/py-worker.js";
 import { setupPopup } from "./js/popupcontainer.js";
 'use strict';
 /*
@@ -152,7 +152,7 @@ function refreshFileList() {
     });
 }
 
-export function saveNewFile(fname = undefined) {
+export function saveNewFile(fname = undefined, prompt = true) {
     const fileName = fname === undefined ? window.prompt("請輸入檔案名稱", "main.py") : fname;
     if (fileName && fileName.endsWith(".py")) {
         // encodde filename first
@@ -161,7 +161,7 @@ export function saveNewFile(fname = undefined) {
             currentFile.path = "root/" + encodedFileName;
             currentFile.filename = fileName;
             refreshFileList();
-            window.alert("儲存成功");
+            prompt ? window.alert("儲存成功") : null;
         }).catch(err => {
             window.alert("儲存失敗，目前檔案名稱只能用英文喔！");
             console.error(err);
