@@ -38,12 +38,16 @@ creatTeacherLink.addEventListener("click", () => {
     });
     stopBroadCastButton.textContent = "教師廣播中（點此停止廣播)";
     stopBroadCastButton.addEventListener("click", () => {
-        window["BMeditor"].removeChangeListener(broadCastCallback);
+        if(!window.confirm("確定要停止廣播？")) return;
         PeerConnection.settingBroadcastSystem({
             isTeacher: false,
             data: () => ''
         });
+        PeerConnection.studentConns.forEach((conn) => {
+            conn.close();
+        });
         connectToTeacher.removeAttribute("disabled");
+        creatTeacherLink.removeAttribute("disabled");
         statusContainer.remove();
     });
     ["button", "button-large", "button-warning"].forEach((className) => {
@@ -73,6 +77,7 @@ creatTeacherLink.addEventListener("click", () => {
     });
     document.body.appendChild(statusContainer);
     connectToTeacher.setAttribute("disabled", true);
+    creatTeacherLink.setAttribute("disabled", true);
 });
 
 connectToTeacher.addEventListener("click", () => {
