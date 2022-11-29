@@ -152,7 +152,7 @@ function refreshFileList() {
     });
 }
 
-export function saveNewFile(fname = undefined, prompt = true) {
+export function saveNewFile(fname = undefined, prompt = true ,callback = null) {
     const fileName = fname === undefined ? window.prompt("請輸入檔案名稱", "main.py") : fname;
     if (fileName && fileName.endsWith(".py")) {
         // encodde filename first
@@ -161,6 +161,9 @@ export function saveNewFile(fname = undefined, prompt = true) {
             currentFile.path = "root/" + encodedFileName;
             currentFile.filename = fileName;
             refreshFileList();
+            if(typeof callback === "function") {
+                callback();
+            }
             prompt ? window.alert("儲存成功") : null;
         }).catch(err => {
             window.alert("儲存失敗，目前檔案名稱只能用英文喔！");

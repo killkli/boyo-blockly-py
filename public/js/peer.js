@@ -126,8 +126,9 @@ selfPeer.on("connection", (conn) => {
             studentItem.appendChild(receivedCodeBadge);
             receivedCodeBadge.addEventListener("click", () => {
                 if (window.confirm(`是否要接收${conn.metadata.name}的程式碼？`)) {
-                    saveNewFile(`ST_${conn.connectionId}.py`)
-                    window["BMeditor"].setCode(data.code);
+                    saveNewFile(`ST_${conn.connectionId}.py`, false, () => {
+                        window["BMeditor"].setCode(data.code);
+                    });
                     receivedCodeBadge.remove();
                 }
             });

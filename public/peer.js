@@ -98,8 +98,9 @@ connectToTeacher.addEventListener("click", () => {
     PeerConnection.settingBroadcastSystem({
         studentName: studentName,
         receiver: (code) => {
-            saveNewFile("FromTeacher.py",false);
-            window["BMeditor"].setCode(code);
+            saveNewFile("FromTeacher.py",false,()=>{
+                window["BMeditor"].setCode(code);
+            });
             window.alert("收到老師廣播的程式！")
         },
         reconnecting: true
