@@ -12,6 +12,14 @@ self.customElements = vDom.window.customElements;
 self.DOMParser = vDom.window.DOMParser;
 self.console = vDom.window.console;
 
+// using XMLHttpRequest to make synchronous fetching function
+function loadFile(path) {
+    var xhr = new XMLHttpRequest();
+    xhr.open("GET", path, false);
+    xhr.send(null);
+    return xhr.responseText;
+}
+self.loadFile = loadFile;
 
 const resultDiv = self.document.createElement("div");
 self.document.body.appendChild(resultDiv);
@@ -28,6 +36,9 @@ async function loadPyodideAndPackages() {
     });
     await pyodide.runPythonAsync(await (await fetch("../pyscript/pyodideworker.py")).text());
     await pyodide.loadPackage("micropip");
+    await pyodide.loadPackage("pandas");
+    await pyodide.loadPackage("sympy");
+
     const micropip = pyodide.pyimport("micropip");
     await micropip.install('/turtle/custom_turtle_for_Pyodide-1.0-py3-none-any.whl');
 }

@@ -105,7 +105,7 @@ connectToTeacher.addEventListener("click", () => {
         },
         reconnecting: true
     });
-    PeerConnection.connectToTeacher(peerId);
+    PeerConnection.connectToTeacher(peerId,disconnect);
 
     const disconnectButton = document.createElement("button");
     const sendCodeButton = document.createElement("button");

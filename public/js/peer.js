@@ -182,18 +182,18 @@ export function settingBroadcastSystem(userSettings = settings) {
     Object.assign(settings, userSettings);
 }
 
-export function connectToTeacher(customID = undefined) {
+export function connectToTeacher(customID = undefined, disconnect_callback = () => console.log("connection closed")) {
     const urlParams = new URLSearchParams(window.location.search);
     const peerId = customID ?? urlParams.get('peer');
     if (peerId) {
         selfPeer.removeAllListeners("open");
         settings.isTeacher = false;
         if (!selfPeer.disconnected) {
-            makeConnectionToTeacher(peerId);
+            makeConnectionToTeacher({ peerId, retryTimes: 0, disconnect_callback });
         } else {
             selfPeer.reconnect();
             selfPeer.on("open", () => {
-                makeConnectionToTeacher(peerId);
+                makeConnectionToTeacher({ peerId, retryTimes: 0, disconnect_callback });
             });
         }
     } else {
@@ -201,7 +201,13 @@ export function connectToTeacher(customID = undefined) {
     }
 }
 
-function makeConnectionToTeacher(peerId) {
+const RETRY_LIMIT = 10;
+function makeConnectionToTeacher({
+    peerId,
+    retryTimes = 0,
+    disconnect_callback = () => console.log("connection closed")
+}) {
+    let retry_count = retryTimes;
     const conn = selfPeer.connect(peerId, { metadata: { name: settings.studentName } });
     conn.on('open', () => {
         // Receive messages
@@ -227,11 +233,16 @@ function makeConnectionToTeacher(peerId) {
     conn.on("close", () => {
         console.log("connection closed");
         connectionToTeacher.conn = null;
-        if (settings.reconnecting) {
-            console.log("attempting to reconnect");
-            makeConnectionToTeacher();
-            return;
-        }
+        // if (settings.reconnecting && retry_count < RETRY_LIMIT) {
+        //     console.log("attempting to reconnect");
+        //     makeConnectionToTeacher({
+        //         peerId,
+        //         retryTimes: retry_count + 1,
+        //         disconnect_callback
+        //     });
+        //     return;
+        // }
+        disconnect_callback();
         createDialog("與老師的連線已斷開，請重新連結！");
     });
 }
