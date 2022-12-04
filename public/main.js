@@ -73,7 +73,8 @@ const currentFile = {
      */
 goVMEditorButton.addEventListener("click", async () => {
     await localStore.setItem('user', { uid: "__futurecoder_offline__", editorContent: editor.getCode() });
-    window.location.href = "/course/#ide";
+    //     window.location.href = "/course/#ide";
+    window.open("/course/#ide", '_blank').focus();
 });
 stopButton.addEventListener("click", () => {
     resetWorker();
