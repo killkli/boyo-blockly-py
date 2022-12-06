@@ -13,11 +13,15 @@ self.DOMParser = vDom.window.DOMParser;
 self.console = vDom.window.console;
 
 // using XMLHttpRequest to make synchronous fetching function
-function loadFile(path) {
+function loadFile(path,arraybuffer = false) {
+    var prePath = "https://killkli.ddns.net:8787/";
     var xhr = new XMLHttpRequest();
-    xhr.open("GET", path, false);
+    if(arraybuffer) {
+        xhr.responseType = 'arraybuffer';
+    }
+    xhr.open("GET", prePath+path, false);
     xhr.send(null);
-    return xhr.responseText;
+    return arraybuffer ? xhr.response : xhr.responseText;
 }
 self.loadFile = loadFile;
 

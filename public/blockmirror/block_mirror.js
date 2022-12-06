@@ -2809,6 +2809,8 @@ TOOLBOX_CATEGORY.DECISIONS = {
     "___ < ___",
     "___ and ___",
     "not ___",
+    "if ___: pass\nelif ___: pass",
+    "if ___: pass\nelif ___: pass\nelse: pass",
   ],
 };
 TOOLBOX_CATEGORY.CALCULATIONS = {
