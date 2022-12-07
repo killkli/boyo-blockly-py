@@ -125,4 +125,5 @@ const setCanvas = (canvas) => {
     }, [canvas]);
 }
 
+
 export { asyncRun, loadPaths, loadPackages, resetWorker, setCanvas };

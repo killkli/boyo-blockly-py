@@ -23,6 +23,7 @@ function loadFile(path,arraybuffer = false) {
     xhr.send(null);
     return arraybuffer ? xhr.response : xhr.responseText;
 }
+
 self.loadFile = loadFile;
 
 const resultDiv = self.document.createElement("div");

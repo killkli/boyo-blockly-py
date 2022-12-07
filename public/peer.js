@@ -112,11 +112,11 @@ connectToTeacher.addEventListener("click", () => {
     const statusContainer = document.createElement("div");
     statusContainer.appendChild(disconnectButton);
     statusContainer.appendChild(sendCodeButton);
-    disconnectButton.textContent = "與老師連線中（點此斷開連線)";
-    disconnectButton.addEventListener("click", () => {
-        disconnect();
-        statusContainer.remove();
-    });
+    disconnectButton.textContent = "與老師連線中";
+    // disconnectButton.addEventListener("click", () => {
+    //     disconnect();
+    //     statusContainer.remove();
+    // });
     ["button", "button-large", "button-warning"].forEach((className) => {
         disconnectButton.classList.add(className);
     });
