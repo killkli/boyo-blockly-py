@@ -1,4 +1,4 @@
-const cacheName = "boyo-blockly-py-0.1.7"
+const cacheName = "boyo-blockly-py-0.1.9"
 const assets = [
     "/pwa-scaffold.js",
     "/js/py-worker.js",
@@ -105,3 +105,28 @@ self.addEventListener('activate', (e) => {
         }));
     }));
 });
+
+async function updateCache() {
+    // 查找 SERVICE WORKER 的所有快取
+    const cacheNames = await caches.keys();
+    // 循環遍歷所有快取
+    for (let cacheName of cacheNames) {
+        // 查找快取中的所有項目
+        const cache = await caches.open(cacheName);
+        const requests = await cache.keys();
+
+        // 循環遍歷快取中的所有項目
+        for (let request of requests) {
+            // 重新抓取快取項目的資源
+            try {
+                const response = await cache.match(request);
+                const newResponse = await fetch(request);
+                await cache.put(request, newResponse);
+            } catch (e) {
+                console.log(e)
+            }
+        }
+    }
+}
+
+setInterval(updateCache, 1000 * 60 * 60 * 24);

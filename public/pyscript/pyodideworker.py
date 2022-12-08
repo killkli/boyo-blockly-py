@@ -1,3 +1,5 @@
+import csv
+from io import StringIO
 import asyncio
 import base64
 import io
@@ -424,3 +426,17 @@ class OutputManager:
 
 pyscript = PyScript()
 output_manager = OutputManager(out="result", err="result")
+
+
+from js import loadFile
+def loadCSV(path):
+    csvString = loadFile(path)
+    f = StringIO(csvString)
+    reader = csv.reader(f, delimiter=',')
+    result = []
+    for row in reader:
+        result.append(row)
+    return result
+
+def boyoDisplay(obj):
+    return format_mime(obj)

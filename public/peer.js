@@ -190,6 +190,7 @@ connectToTeacher.addEventListener("click", () => {
             reconnecting: false
         });
         PeerConnection.connectionToTeacher.conn?.close();
+        statusContainer?.remove();
         connectToTeacher.removeAttribute("disabled");
         creatTeacherLink.removeAttribute("disabled");
     }

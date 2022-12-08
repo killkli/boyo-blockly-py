@@ -2870,6 +2870,8 @@ TOOLBOX_CATEGORY.INPUT = {
   blocks: [
     "input('Your Name?')",
     "print('Hello World')",
+    "loadCSV('網路位置')",
+    "boyoDisplay(___)",
     "random.randint(1,100)",
     "random.choice(['蘋果 apple','水蜜桃 peach'])",
     "random.sample(range(100),50)",
