@@ -33,9 +33,12 @@ stopButton.style.display = "none";
 async function codeExcute(script) {
     stopButton.style.display = "block";
     const canvas = document.createElement("canvas");
-    canvas.width = 500;
-    canvas.height = 500;
-    setCanvas(canvas.transferControlToOffscreen());
+    if (canvas.transferControlToOffscreen) {
+        canvas.width = 500;
+        canvas.height = 500;
+        setCanvas(canvas.transferControlToOffscreen());
+        resultDiv.appendChild(canvas);
+    }
     try {
         const { results, error, stdout } = await asyncRun(script, {}, 30);
         let message = stdout !== undefined ? stdout : "";
@@ -45,7 +48,6 @@ async function codeExcute(script) {
             message += error;
         }
         resultDiv.innerHTML = message;
-        resultDiv.appendChild(canvas);
         stopButton.style.display = "none";
     } catch (e) {
         const message = `Error in pyodideWorker at ${e.filename}, Line: ${e.lineno}, ${e.message}`;
@@ -153,7 +155,7 @@ function refreshFileList() {
     });
 }
 
-export function saveNewFile(fname = undefined, prompt = true ,callback = null) {
+export function saveNewFile(fname = undefined, prompt = true, callback = null) {
     const fileName = fname === undefined ? window.prompt("請輸入檔案名稱", "main.py") : fname;
     if (fileName && fileName.endsWith(".py")) {
         // encodde filename first
@@ -162,7 +164,7 @@ export function saveNewFile(fname = undefined, prompt = true ,callback = null) {
             currentFile.path = "root/" + encodedFileName;
             currentFile.filename = fileName;
             refreshFileList();
-            if(typeof callback === "function") {
+            if (typeof callback === "function") {
                 callback();
             }
             prompt ? window.alert("儲存成功") : null;

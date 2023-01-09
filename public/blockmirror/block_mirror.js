@@ -2681,6 +2681,7 @@ function makeFunctionBlock(name, returns, values, message, aliases, module) {
 function makeTurtleBlock(name, returns, values, message, aliases) {
   makeFunctionBlock(name, returns, values, message, aliases, "turtle");
 }
+makeTurtleBlock("speed", false, ["amount"], "🐢速度", []);
 makeTurtleBlock("forward", false, ["amount"], "🐢前進", ["fd"]);
 makeTurtleBlock("backward", false, ["amount"], "🐢後退", ["bd"]);
 makeTurtleBlock("right", false, ["angle"], "🐢向右轉", ["rt"]);
@@ -2840,6 +2841,7 @@ TOOLBOX_CATEGORY.TURTLES = {
   colour: "PLOTTING",
   blocks: [
     "turtle.done()",
+    "turtle.speed(10)",
     "turtle.set_defaults(canvwidth=500,canvheight=500)",
     "turtle.forward(50)",
     "turtle.backward(50)",

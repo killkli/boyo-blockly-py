@@ -1,53 +1,34 @@
 import { saveNewFile } from "../main.js"
+
+/**
+ * @type {import('qrcode')}
+ */
+const QRCode = window.QRCode;
+
 /**
  * @type {import('peerjs').Peer}
  */
-const selfPeer = new Peer({
+let selfPeer = new Peer({
     host: 'killkli.ddns.net',
     key: "killkliAPI",
     secure: true,
     port: 9000,
 });
-export const studentConns = [];
-export const connectionToTeacher = { conn: null }
-export const errorInfos = {
-    message: null
-}
-const settings = {
-    dataDom: "#messageCode",
-    data: () => {
-        return document.querySelector(settings.dataDom).value;
-    },
-    recevierDom: "#messageCode",
-    receiver: (code) => {
-        const receiverDom = document.querySelector(settings.recevierDom);
-        receiverDom.value = code;
-    },
-    studentListDom: "#studentList",
-    studentName: "student",
-    isTeacher: false,
-    reconnecting: true,
-}
-export function isTeacher() {
-    return settings.isTeacher === true;
-}
-
-selfPeer.on("close", () => {
-    console.log("connection closed");
-    console.log("attempting to reconnect");
-    try {
-        selfPeer.reconnect();
-    } catch (error) {
-        console.log("無法重新登入，原因：", error);
-        errorInfos.message = "無法重新登入，網路錯誤！";
-        selfPeer.removeAllListeners("close");
-    }
-});
-
-
-// injecting badge span style
-const badgeStyle = document.createElement("style");
-badgeStyle.innerHTML = `
+function settingSelfPeer() {
+    selfPeer.on("close", () => {
+        console.log("connection closed");
+        console.log("attempting to reconnect");
+        try {
+            selfPeer.reconnect();
+        } catch (error) {
+            console.log("無法重新登入，原因：", error);
+            errorInfos.message = "無法重新登入，網路錯誤！";
+            selfPeer.removeAllListeners("close");
+        }
+    });
+    // injecting badge span style
+    const badgeStyle = document.createElement("style");
+    badgeStyle.innerHTML = `
     .badge {
         position: relative;
         top: -1px;
@@ -89,57 +70,89 @@ badgeStyle.innerHTML = `
     }
 
 `;
-document.head.appendChild(badgeStyle);
+    document.head.appendChild(badgeStyle);
 
-selfPeer.on("connection", (conn) => {
-    studentConns.push(conn);
-    // creating connection dom element
-    const studentList = document.querySelector(settings.studentListDom);
-    const studentItem = document.createElement("li");
-    studentItem.classList.add("list-group-item");
-    studentItem.innerText = conn.metadata.name;
-    studentItem.id = conn.metadata.name;
-    const studentBadge = document.createElement("span");
-    studentBadge.classList.add("badge");
-    studentBadge.classList.add("badge-primary");
-    studentBadge.classList.add("badge-pill");
-    studentBadge.innerText = "連線中";
-    studentItem.appendChild(studentBadge);
-    studentList.appendChild(studentItem);
-    // send code to the specific student
-    studentBadge.addEventListener("click", () => {
-        if (window.confirm("確定要傳送程式碼給" + conn.metadata.name + "嗎？")) {
-            conn.send({
-                type: "teacherInfo",
-                code: settings.data()
-            });
-        }
+    selfPeer.on("connection", (conn) => {
+        studentConns.push(conn);
+        // creating connection dom element
+        const studentList = document.querySelector(settings.studentListDom);
+        const studentItem = document.createElement("li");
+        studentItem.classList.add("list-group-item");
+        studentItem.innerText = conn.metadata.name;
+        studentItem.id = conn.metadata.name;
+        const studentBadge = document.createElement("span");
+        studentBadge.classList.add("badge");
+        studentBadge.classList.add("badge-primary");
+        studentBadge.classList.add("badge-pill");
+        studentBadge.innerText = "連線中";
+        studentItem.appendChild(studentBadge);
+        studentList.appendChild(studentItem);
+        // send code to the specific student
+        studentBadge.addEventListener("click", () => {
+            if (window.confirm("確定要傳送程式碼給" + conn.metadata.name + "嗎？")) {
+                conn.send({
+                    type: "teacherInfo",
+                    code: settings.data()
+                });
+            }
+        });
+        conn.on("data", (data) => {
+            console.log('Teacher server received:', data);
+            if (data.type && data.type === "code") {
+                const receivedCodeBadge = document.createElement("span");
+                receivedCodeBadge.classList.add("badge");
+                receivedCodeBadge.classList.add("badge-primary");
+                receivedCodeBadge.classList.add("badge-pill");
+                receivedCodeBadge.innerText = "收到程式碼@" + new Date().toLocaleTimeString();
+                studentItem.appendChild(receivedCodeBadge);
+                receivedCodeBadge.addEventListener("click", () => {
+                    if (window.confirm(`是否要接收${conn.metadata.name}的程式碼？`)) {
+                        saveNewFile(`ST_${conn.connectionId}.py`, false, () => {
+                            window["BMeditor"].setCode(data.code);
+                        });
+                        receivedCodeBadge.remove();
+                    }
+                });
+            }
+        });
+        conn.on("close", () => {
+            console.log("connection closed");
+            studentItem.remove();
+            studentConns.splice(studentConns.indexOf(conn), 1);
+        });
     });
-    conn.on("data", (data) => {
-        console.log('Teacher server received:', data);
-        if (data.type && data.type === "code") {
-            const receivedCodeBadge = document.createElement("span");
-            receivedCodeBadge.classList.add("badge");
-            receivedCodeBadge.classList.add("badge-primary");
-            receivedCodeBadge.classList.add("badge-pill");
-            receivedCodeBadge.innerText = "收到程式碼@" + new Date().toLocaleTimeString();
-            studentItem.appendChild(receivedCodeBadge);
-            receivedCodeBadge.addEventListener("click", () => {
-                if (window.confirm(`是否要接收${conn.metadata.name}的程式碼？`)) {
-                    saveNewFile(`ST_${conn.connectionId}.py`, false, () => {
-                        window["BMeditor"].setCode(data.code);
-                    });
-                    receivedCodeBadge.remove();
-                }
-            });
-        }
-    });
-    conn.on("close", () => {
-        console.log("connection closed");
-        studentItem.remove();
-        studentConns.splice(studentConns.indexOf(conn), 1);
-    });
-});
+}
+settingSelfPeer();
+
+
+
+export const studentConns = [];
+export const connectionToTeacher = { conn: null }
+export const errorInfos = {
+    message: null
+}
+const settings = {
+    dataDom: "#messageCode",
+    data: () => {
+        return document.querySelector(settings.dataDom).value;
+    },
+    recevierDom: "#messageCode",
+    receiver: (code) => {
+        const receiverDom = document.querySelector(settings.recevierDom);
+        receiverDom.value = code;
+    },
+    studentListDom: "#studentList",
+    studentName: "student",
+    isTeacher: false,
+    reconnecting: true,
+}
+export function isTeacher() {
+    return settings.isTeacher === true;
+}
+
+
+
+
 
 export function createTeacherLink(callTimes = 0) {
     if (selfPeer.id === undefined || selfPeer.id === null) {
@@ -163,7 +176,7 @@ export function createTeacherLink(callTimes = 0) {
     連結ID：
     ${selfPeer.id}
     請複製連結並傳送給學生！
-    `);
+    `, false, teacherLink);
     settings.isTeacher = true;
 }
 
@@ -233,15 +246,6 @@ function makeConnectionToTeacher({
     conn.on("close", () => {
         console.log("connection closed");
         connectionToTeacher.conn = null;
-        // if (settings.reconnecting && retry_count < RETRY_LIMIT) {
-        //     console.log("attempting to reconnect");
-        //     makeConnectionToTeacher({
-        //         peerId,
-        //         retryTimes: retry_count + 1,
-        //         disconnect_callback
-        //     });
-        //     return;
-        // }
         disconnect_callback();
         createDialog("與老師的連線已斷開，請重新連結！");
     });
@@ -249,7 +253,7 @@ function makeConnectionToTeacher({
 
 
 
-export function createDialog(message, noclosebutton = false) {
+export function createDialog(message, noclosebutton = false, qrlink = false) {
     const dialog = document.createElement("dialog");
     const dialogBody = document.createElement("div");
     dialog.appendChild(dialogBody);
@@ -276,6 +280,17 @@ export function createDialog(message, noclosebutton = false) {
     dialog.classList.add("resultScreenDialog");
     dialogBody.classList.add("resultScreen");
     dialog.style.height = "500px";
+    if (qrlink !== false && typeof qrlink === "string") {
+        const qrCodeContainer = document.createElement("div");
+        qrCodeContainer.classList.add("qrCodeContainer");
+        const qrCodeDescription = document.createElement("p");
+        qrCodeDescription.innerText = "或是掃描下方QR Code";
+        qrCodeContainer.appendChild(qrCodeDescription);
+        const qrCode = document.createElement("img");
+        QRCode.toDataURL(qrlink).then(url => qrCode.src = url);
+        qrCodeContainer.appendChild(qrCode);
+        dialogTextContainer.appendChild(qrCodeContainer);
+    }
     dialog.showModal();
     return dialog;
 }
