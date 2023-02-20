@@ -9,7 +9,7 @@ const QRCode = window.QRCode;
  * @type {import('peerjs').Peer}
  */
 let selfPeer = new Peer({
-    host: 'killkli.ddns.net',
+    host: 'boyofunpython.ddns.net',
     key: "killkliAPI",
     secure: true,
     port: 9000,
